@@ -113,7 +113,7 @@ The automation will create the export entry in the `/etc/exports` file and reloa
 also start the NFS server service if it is not already running.
 
 ```bash
-# Create an export directory is not already created
+# Create an export directory if not already created
 mkdir /exports
 
 # create test file if testing:
@@ -237,11 +237,12 @@ Successfully removed mount /mnt/test
 
 
 # Implementation Details
-As mentioned, I use KVM vm for my dev work. To make this tool work effortlessly, I create golden images for operating
+As mentioned, I use KVM for my dev work. To make this tool work effortlessly, I create golden images for operating
 systems that I need to work on. The golden dev images include the client configuration steps above. That way, all I
 have to do is deploy a new VM from the golden image and run the client commands to mount the shared directory.
 
 I work with python often so I create a python virtual environment on the golden image then setup my .bashrc to activate
 the venv when I login. That way, I can use the console commands above to add the share storage to the VM. Then I can
 navigate to the share directory and run `pip install -e .` which will install the python dev environment that I plan to
-work on to the new VM virtual environment.
+work on to the new VM virtual environment. Any changes done on the host system will be reflected on the guest system,
+but expect a few second delay on changes due to NFS caching.
