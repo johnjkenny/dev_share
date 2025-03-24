@@ -31,6 +31,14 @@ def share_parent():
 
 def parse_server_args(args: dict):
     from dev_share.utils import ShareServer
+    if args.get('start'):
+        return ShareServer().start_service('nfs-server')
+    if args.get('status'):
+        return ShareServer().service_status('nfs-server')
+    if args.get('stop'):
+        return ShareServer().stop_service('nfs-server')
+    if args.get('reload'):
+        return ShareServer().reload_exports()
     if args.get('export'):
         return ShareServer().add_export(args['export'], args['access'], args['options'])
     if args.get('remove'):
@@ -47,32 +55,52 @@ def share_server(parent_args: list = None):
     from dev_share.utils import ShareUtils
     subnet = ShareUtils()._get_env_subnet() or '*'
     args = ArgParser('Share Server', parent_args, {
-        'export': {
-            'short': 'e',
-            'help': 'export directory (Provide full path)',
-        },
         'access': {
             'short': 'a',
             'help': f'access IP or subnet for export. Default: {subnet}',
             'default': subnet,
-        },
-        'options': {
-            'short': 'o',
-            'help': 'export options. Default: rw,sync,no_subtree_check,no_root_squash',
-            'default': 'rw,sync,no_subtree_check,no_root_squash',
         },
         'display': {
             'short': 'd',
             'help': 'display exports',
             'action': 'store_true',
         },
-        'remove': {
-            'short': 'R',
-            'help': 'remove export directory (Provide full path)',
+        'export': {
+            'short': 'e',
+            'help': 'export directory (Provide full path)',
         },
         'init': {
             'short': 'I',
             'help': 'initialize server service',
+            'action': 'store_true'
+        },
+        'options': {
+            'short': 'o',
+            'help': 'export options. Default: rw,sync,no_subtree_check,no_root_squash',
+            'default': 'rw,sync,no_subtree_check,no_root_squash',
+        },
+        'reload': {
+            'short': 'r',
+            'help': 'reload export configuration',
+            'action': 'store_true'
+        },
+        'remove': {
+            'short': 'R',
+            'help': 'remove export directory (Provide full path)',
+        },
+        'start': {
+            'short': 's',
+            'help': 'start server service',
+            'action': 'store_true',
+        },
+        'status': {
+            'short': 'st',
+            'help': 'server service status',
+            'action': 'store_true',
+        },
+        'stop': {
+            'short': 'S',
+            'help': 'stop server service',
             'action': 'store_true'
         },
     }).set_arguments()
@@ -83,6 +111,12 @@ def share_server(parent_args: list = None):
 
 def parse_client_args(args: dict):
     from dev_share.utils import ShareClient
+    if args.get('start'):
+        return ShareClient().start_service('nfs-client.target')
+    if args.get('status'):
+        return ShareClient().service_status('nfs-client.target')
+    if args.get('stop'):
+        return ShareClient().stop_service('nfs-client.target')
     if args.get('create'):
         if not args.get('ip') or not args.get('remote'):
             print('IP and remote directory are required when creating a mount point')
@@ -102,9 +136,19 @@ def share_client(parent_args: list = None):
             'short': 'c',
             'help': 'create mount point (Provide full path to new mount point)',
         },
+        'init': {
+            'short': 'I',
+            'help': 'initialize client service',
+            'action': 'store_true'
+        },
         'ip': {
             'short': 'i',
             'help': 'server IP address to use when creating mount point',
+        },
+        'options': {
+            'short': 'o',
+            'help': 'mount options. Default: defaults,nofail,_netdev',
+            'default': 'defaults,nofail,_netdev',
         },
         'remote': {
             'short': 'r',
@@ -114,14 +158,19 @@ def share_client(parent_args: list = None):
             'short': 'R',
             'help': 'remove mount point (Provide full path to mount point)',
         },
-        'options': {
-            'short': 'o',
-            'help': 'mount options. Default: defaults,nofail,_netdev',
-            'default': 'defaults,nofail,_netdev',
+        'start': {
+            'short': 's',
+            'help': 'start client service',
+            'action': 'store_true',
         },
-        'init': {
-            'short': 'I',
-            'help': 'initialize client service',
+        'status': {
+            'short': 'st',
+            'help': 'client service status',
+            'action': 'store_true',
+        },
+        'stop': {
+            'short': 'S',
+            'help': 'stop client service',
             'action': 'store_true'
         },
     }).set_arguments()

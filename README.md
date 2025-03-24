@@ -1,6 +1,6 @@
-# dev_share
+# Dev-Share
 
-I do a lot of dev work locally on my system utilizing KVM vms. This is a dev tool that I find useful to share files
+I do a lot of dev work locally on my system utilizing KVM. This is a dev tool that I find useful to share files
 between my host and guest systems which allows me to dev on my host and test on the guest. It is simply a wrapper around
 NFS, but hopefully it will be useful to others and remove some of the manual steps involved in setting up NFS and
 sharing files between your dev and qa systems.
@@ -54,11 +54,6 @@ Failed to auto-detect virbr subnet. Please enter the subnet manually [192.168.12
 dshare --client --init
 ```
 
-### Optional: Set command shortcut in your shell RC file (e.g. .bashrc, .zshrc) so you do not have to active venv
-```bash
-echo "alias shareServer='/<path_to_dir_where_you_created_venv>/venv/bin/python3 dshare' " >> ~/.bashrc
-```
-
 # Usage
 
 ## Parent Commands:
@@ -77,6 +72,41 @@ options:
 ```
 
 ## Server
+
+```bash
+dshare -s -h
+usage: dshare [-h] [-a ACCESS] [-d] [-e EXPORT] [-I] [-o OPTIONS] [-r] [-R REMOVE] [-s] [-st] [-S]
+
+Share Server
+
+options:
+  -h, --help            show this help message and exit
+
+  -a ACCESS, --access ACCESS
+                        access IP or subnet for export. Default: 192.168.122.0/24
+
+  -d, --display         display exports
+
+  -e EXPORT, --export EXPORT
+                        export directory (Provide full path)
+
+  -I, --init            initialize server service
+
+  -o OPTIONS, --options OPTIONS
+                        export options. Default: rw,sync,no_subtree_check,no_root_squash
+
+  -r, --reload          reload export configuration
+
+  -R REMOVE, --remove REMOVE
+                        remove export directory (Provide full path)
+
+  -s, --start           start server service
+
+  -st, --status         server service status
+
+  -S, --stop            stop server service
+```
+
 
 ### Create Export
 The automation will create the export entry in the `/etc/exports` file and reload the exportfs configuration. It will
@@ -141,8 +171,40 @@ Exports:
 ```
 
 
-
 ## Client
+
+```bash
+dshare -c -h
+usage: dshare [-h] [-c CREATE] [-I] [-i IP] [-o OPTIONS] [-r REMOTE] [-R REMOVE] [-s] [-st] [-S]
+
+Share Client
+
+options:
+  -h, --help            show this help message and exit
+
+  -c CREATE, --create CREATE
+                        create mount point (Provide full path to new mount point)
+
+  -I, --init            initialize client service
+
+  -i IP, --ip IP        server IP address to use when creating mount point
+
+  -o OPTIONS, --options OPTIONS
+                        mount options. Default: defaults,nofail,_netdev
+
+  -r REMOTE, --remote REMOTE
+                        remote directory to mount when creating mount point
+
+  -R REMOVE, --remove REMOVE
+                        remove mount point (Provide full path to mount point)
+
+  -s, --start           start client service
+
+  -st, --status         client service status
+
+  -S, --stop            stop client service
+```
+
 
 ### Create Mount
 
@@ -175,9 +237,9 @@ Successfully removed mount /mnt/test
 
 
 # Implementation Details
-As mentioned, I use KVM vm for my dev work. To make this tool work effortlessly, I create golden images for OSes that I
-need to work on. The golden dev images include the client configuration steps above. That way, all I have to do is
-deploy a new VM from the golden image and run the client commands to mount the shared directory.
+As mentioned, I use KVM vm for my dev work. To make this tool work effortlessly, I create golden images for operating
+systems that I need to work on. The golden dev images include the client configuration steps above. That way, all I
+have to do is deploy a new VM from the golden image and run the client commands to mount the shared directory.
 
 I work with python often so I create a python virtual environment on the golden image then setup my .bashrc to activate
 the venv when I login. That way, I can use the console commands above to add the share storage to the VM. Then I can
