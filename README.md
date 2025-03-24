@@ -18,7 +18,7 @@ The below expects that KVM is installed on the host system and a virbr0 network 
 
 ## Server Installation (Host)
 The server initialization will try to find the default subnet to allow guest access by parsing the `virbr0` interface.
-If it fails, it will prompt for a subnet to use. The subnet is used to create firewall rules and is cached to to be
+If it fails, it will prompt for a subnet to use. The subnet is used to create firewall rules and is cached to be
 used as the default subnet in the export config. The initialization will also install the NFS dependencies.
 
 
@@ -83,7 +83,7 @@ options:
   -h, --help            show this help message and exit
 
   -a ACCESS, --access ACCESS
-                        access IP or subnet for export. Default: 192.168.122.0/24
+                        access IP or subnet for export. Default: 192.168.124.0/24
 
   -d, --display         display exports
 
