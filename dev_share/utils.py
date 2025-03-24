@@ -92,6 +92,20 @@ class ShareUtils():
         """
         return self.run_cmd(f'sudo systemctl is-active {service}', True, False)[0].strip() == 'inactive'
 
+    def _start_and_enable_nfs_server(self):
+        if self.run_cmd('sudo systemctl enable --now nfs-server')[1]:
+            sleep(1)
+            return self.is_service_active('nfs-server')
+        self.log.error('Failed to start and enable nfs-server')
+        return False
+
+    def _start_and_enable_nfs_client(self):
+        if self.run_cmd('sudo systemctl enable --now nfs-client.target')[1]:
+            sleep(1)
+            return self.is_service_active('nfs-client.target')
+        self.log.error('Failed to start and enable nfs-client')
+        return False
+
     def start_service(self, service: str) -> bool:
         """Start a service
 
@@ -120,6 +134,22 @@ class ShareUtils():
             sleep(1)
             return self.is_service_inactive(service)
         self.log.error(f'Failed to stop service: {service}')
+        return False
+
+    def service_status(self, service: str) -> bool:
+        """Get the status of a service
+
+        Args:
+            service (str): Service name
+
+        Returns:
+            bool: True if active, False otherwise
+        """
+        rsp = self.run_cmd(f'sudo systemctl status {service}', True, False)
+        if rsp[1]:
+            self.display_successful(rsp[0])
+            return True
+        self.display_failed(rsp[0])
         return False
 
     @staticmethod
@@ -205,7 +235,7 @@ class ShareServer(ShareUtils):
         except Exception:
             self.log.exception('Failed to set exports file')
             return False
-        return self.reload_exports() and self.display_exports()
+        return self.reload_exports()
 
     def __ensure_service_is_running(self) -> bool:
         """Ensure the NFS service is running. If service is not running, attempt to start it
@@ -225,7 +255,7 @@ class ShareServer(ShareUtils):
             bool: True if successful, False otherwise
         """
         if self.run_cmd('sudo exportfs -rav')[1]:
-            return self.__ensure_service_is_running()
+            return self.__ensure_service_is_running() and self.display_exports()
         self.log.error('Failed to reload exports')
         return False
 

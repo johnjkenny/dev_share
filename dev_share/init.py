@@ -121,7 +121,7 @@ class Init(ShareUtils):
             bool: True if successful, False otherwise
         """
         for method in [self.__stash_bridge_subnet, self.__install_system_dependencies,
-                       self.__set_server_firewall_config]:
+                       self.__set_server_firewall_config, self._start_and_enable_nfs_server]:
             if not method():
                 self.log.debug(f'Failed to initialize server: {method.__name__}')
                 return False
@@ -133,7 +133,7 @@ class Init(ShareUtils):
         Returns:
             bool: True if successful, False otherwise
         """
-        for method in [self.__install_system_dependencies]:
+        for method in [self.__install_system_dependencies, self._start_and_enable_nfs_client]:
             if not method():
                 self.log.debug(f'Failed to initialize client: {method.__name__}')
                 return False
